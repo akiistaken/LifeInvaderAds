@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+.env
+.env.local
+.DS_Store
+*.log
+_cars.xlsx
+_templates.xlsx

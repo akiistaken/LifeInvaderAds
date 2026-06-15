@@ -1,0 +1,39 @@
+{
+  "name": "li-auto-ads",
+  "version": "1.0.0",
+  "workspaces": [
+    "web"
+  ],
+  "description": "\"# LI\"",
+  "homepage": "https://github.com/galaxy338/LI#readme",
+  "bugs": {
+    "url": "https://github.com/galaxy338/LI/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/galaxy338/LI.git"
+  },
+  "license": "ISC",
+  "engines": {
+    "node": "24.14.0",
+    "next": "16.2.0"
+  },
+  "author": "",
+  "type": "commonjs",
+  "main": "darken.js",
+  "scripts": {
+    "sync": "node fetch_data.js",
+    "parse": "node parse_items.js",
+    "dev": "cd web && npm run dev",
+    "build": "cd web && npm run build",
+    "start": "cd web && npm run start",
+    "refresh": "node fetch_data.js && node parse_items.js"
+  },
+  "dependencies": {
+    "csv-parse": "^6.2.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "next": "16.2.0"
+  }
+}

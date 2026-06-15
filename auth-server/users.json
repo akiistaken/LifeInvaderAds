@@ -1,0 +1,5 @@
+{
+  "users": [
+    { "name": "Admin", "pin": "7978", "role": "admin" }
+  ]
+}
