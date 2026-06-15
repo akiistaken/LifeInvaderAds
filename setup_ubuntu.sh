@@ -50,7 +50,7 @@ pm2 save
 sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u $USER --hp /home/$USER
 
 echo "Configuring Nginx Reverse Proxy..."
-cat <<EOF | sudo tee /etc/nginx/sites-available/lifeinvader
+cat <<EOF | sudo tee /etc/nginx/sites-available/lifeinvader.conf
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
@@ -75,7 +75,7 @@ server {
 }
 EOF
 
-sudo ln -sf /etc/nginx/sites-available/lifeinvader /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/lifeinvader.conf /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo systemctl restart nginx
 
