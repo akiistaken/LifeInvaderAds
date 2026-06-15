@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const AUTH_SERVER = 'http://140.245.20.237:4032';
+const AUTH_SERVER = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4032';
 
 export async function POST(req: Request, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;

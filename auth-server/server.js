@@ -21,7 +21,8 @@ const ALLOWED_ORIGINS = [
     'https://li-web-jet.vercel.app', 
     'https://li-auto-ads.vercel.app',
     'https://li-auto-ads-git-main-galaxy338s-projects.vercel.app',
-    'https://li-auto-ads-galaxy338s-projects.vercel.app'
+    'https://li-auto-ads-galaxy338s-projects.vercel.app',
+    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
 ];
 
 // ─── In-Memory State ───

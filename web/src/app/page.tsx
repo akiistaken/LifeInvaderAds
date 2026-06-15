@@ -2327,7 +2327,7 @@ function RejectionsForm() {
 // ------------- AUTH SERVER CONFIG -------------
 // Proxy through same-origin API route to avoid HTTPS→HTTP mixed content block
 const AUTH_PROXY = '/api/auth';
-const DIRECT_URL = 'http://140.245.20.237:4032';
+const DIRECT_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:4032';
 
 async function authFetch(endpoint: string, options: RequestInit = {}) {
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
