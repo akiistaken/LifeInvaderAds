@@ -183,7 +183,7 @@ async function main() {
             matrix.forEach((row, idx) => {
                 if (idx === 0) return;
                 if (Array.isArray(row)) {
-                    for (let i = 0; i <= 7; i++) {
+                    for (let i = 0; i < row.length; i++) {
                         const cell = row[i];
                         if (cell && cell !== "----" && typeof cell === 'string') {
                             opts.push(cell.trim());
