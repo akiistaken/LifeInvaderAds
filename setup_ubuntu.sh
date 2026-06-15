@@ -2,7 +2,7 @@
 
 # Configuration
 SERVER_IP="153.75.90.105"
-DOMAIN="ads.joblessdevs.space"
+DOMAIN="li.joblessdevs.space"
 REPO_URL="git@github.com:akiistaken/LifeInvaderAds.git"
 APP_DIR="/var/www/LifeInvaderAds"
 
@@ -53,7 +53,7 @@ echo "Configuring Nginx Reverse Proxy..."
 cat <<EOF | sudo tee /etc/nginx/sites-available/lifeinvader.conf
 server {
     listen 80;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name $DOMAIN;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -80,7 +80,7 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo systemctl restart nginx
 
 echo "Setting up SSL with Certbot..."
-sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos -m admin@$DOMAIN --redirect
+sudo certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$DOMAIN --redirect
 
 echo "============================================="
 echo "Setup Complete!"
