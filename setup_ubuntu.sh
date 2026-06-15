@@ -2,7 +2,7 @@
 
 # Configuration
 SERVER_IP="153.75.90.105"
-DOMAIN="joblessdevs.space"
+DOMAIN="ads.joblessdevs.space"
 REPO_URL="git@github.com:akiistaken/LifeInvaderAds.git"
 APP_DIR="/var/www/LifeInvaderAds"
 
