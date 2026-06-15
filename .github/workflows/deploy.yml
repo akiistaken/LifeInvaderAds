@@ -1,0 +1,36 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to application directory
+            cd /var/www/LifeInvaderAds
+            
+            # Pull latest changes
+            git pull origin main
+            
+            # Update Auth Server
+            cd auth-server
+            npm install
+            
+            # Update Web Frontend
+            cd ../web
+            npm install
+            npm run build
+            
+            # Restart pm2 services to apply new code
+            pm2 restart all
+            pm2 save
