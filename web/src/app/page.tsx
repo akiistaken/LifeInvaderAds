@@ -4019,44 +4019,7 @@ export default function App() {
                 </div>
             </div>
 
-            {/* Powered by Detriot Cloud Footer */}
-            <footer className="w-full flex justify-center py-4 mt-8">
-                <a
-                    href="https://detriot.cloud"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-2 px-5 py-2 rounded-full backdrop-blur-md transition-all duration-300 hover:scale-105"
-                    style={{
-                        background: 'rgba(15, 23, 42, 0.65)',
-                        border: '1px solid rgba(56, 189, 248, 0.2)',
-                        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255,255,255,0.05) inset',
-                    }}
-                >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4C9.11 4 6.6 5.64 5.35 8.04C2.34 8.36 0 10.91 0 14C0 17.31 2.69 20 6 20H19C21.76 20 24 17.76 24 15C24 12.36 21.95 10.22 19.35 10.04Z" fill="url(#cloud-grad)" />
-                        <defs>
-                            <linearGradient id="cloud-grad" x1="0" y1="4" x2="24" y2="20" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#38BDF8" />
-                                <stop offset="1" stopColor="#818CF8" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span className="text-[11px] font-semibold tracking-wide" style={{
-                        background: 'linear-gradient(90deg, #94A3B8, #E2E8F0)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                    }}>
-                        Powered by
-                    </span>
-                    <span className="text-[11px] font-extrabold tracking-wide" style={{
-                        background: 'linear-gradient(90deg, #38BDF8, #818CF8)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                    }}>
-                        Detriot Cloud
-                    </span>
-                </a>
-            </footer>
+
 
             {/* Cookie Consent Banner */}
             {cookieConsent === null && (
