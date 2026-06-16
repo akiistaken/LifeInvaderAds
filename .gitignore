@@ -9,3 +9,5 @@ dist/
 *.log
 _cars.xlsx
 _templates.xlsx
+_manager.xlsx
+sync_progress.txt

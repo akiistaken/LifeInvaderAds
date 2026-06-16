@@ -190,13 +190,14 @@ function sendDiscordEmbed(username, howFound, ip) {
 // ─── Data Sync (fetch_data logic) ───
 function downloadFile(url, dest) {
     return new Promise((resolve, reject) => {
-        const file = fs.createWriteStream(dest);
         https.get(url, (res) => {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                file.close();
-                fs.unlinkSync(dest);
                 return downloadFile(res.headers.location, dest).then(resolve).catch(reject);
             }
+            if (res.statusCode >= 400) {
+                return reject(new Error(`HTTP Error ${res.statusCode} while downloading ${url}`));
+            }
+            const file = fs.createWriteStream(dest);
             res.pipe(file);
             file.on('finish', () => { file.close(); resolve(); });
             file.on('error', reject);
@@ -209,6 +210,9 @@ function downloadText(url) {
         https.get(url, (res) => {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 return downloadText(res.headers.location).then(resolve).catch(reject);
+            }
+            if (res.statusCode >= 400) {
+                return reject(new Error(`HTTP Error ${res.statusCode} while downloading text from ${url}`));
             }
             let data = '';
             res.on('data', c => data += c);
@@ -321,7 +325,12 @@ async function runSync() {
 
     // Parse manager xlsx — each sheet tab is a category
     const managerResult = {};
-    const wbManager = xlsx.readFile(path.join(tempDir, '_manager.xlsx'));
+    let wbManager;
+    try {
+        wbManager = xlsx.readFile(path.join(tempDir, '_manager.xlsx'));
+    } catch (e) {
+        throw new Error(`Failed to parse manager prices file. Google Docs might have returned an HTML error or login page instead of the file. Original error: ${e.message}`);
+    }
     for (const sheetName of wbManager.SheetNames) {
         const rows = xlsx.utils.sheet_to_json(wbManager.Sheets[sheetName], { header: 1, raw: false });
         const services = [];
@@ -336,14 +345,24 @@ async function runSync() {
     fs.writeFileSync(path.join(DATA_DIR, 'manager.json'), JSON.stringify(managerResult, null, 2));
 
     const templatesData = {};
-    const wbTemplates = xlsx.readFile(path.join(tempDir, '_templates.xlsx'));
+    let wbTemplates;
+    try {
+        wbTemplates = xlsx.readFile(path.join(tempDir, '_templates.xlsx'));
+    } catch (e) {
+        throw new Error(`Failed to parse templates file. Google Docs might have returned an HTML error or login page instead of the file. Original error: ${e.message}`);
+    }
     for (const sheetName of wbTemplates.SheetNames) {
         templatesData[sheetName] = xlsx.utils.sheet_to_json(wbTemplates.Sheets[sheetName], { header: 1 });
     }
     fs.writeFileSync(path.join(DATA_DIR, 'templates.json'), JSON.stringify(templatesData, null, 2));
 
     const itemsData = {};
-    const wbCars = xlsx.readFile(path.join(tempDir, '_cars.xlsx'));
+    let wbCars;
+    try {
+        wbCars = xlsx.readFile(path.join(tempDir, '_cars.xlsx'));
+    } catch (e) {
+        throw new Error(`Failed to parse cars/items file. Google Docs might have returned an HTML error or login page instead of the file. Original error: ${e.message}`);
+    }
     for (const sheetName of wbCars.SheetNames) {
         itemsData[sheetName] = xlsx.utils.sheet_to_json(wbCars.Sheets[sheetName], { header: 1 });
     }

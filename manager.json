@@ -1,0 +1,52 @@
+{
+  "Sheet1": [
+    {
+      "name": "Shoutout in LifeInvader CNN",
+      "price": "$100.000"
+    },
+    {
+      "name": "City broadcasts (00:00 to 11:59)",
+      "price": "$100.000"
+    },
+    {
+      "name": "City broadcasts (12:00 to 23:59)",
+      "price": "$150.000"
+    },
+    {
+      "name": "Designing a static poster",
+      "price": "$100.000"
+    },
+    {
+      "name": "Designing an animated poster",
+      "price": "$200.000"
+    },
+    {
+      "name": "Designing the promotion message",
+      "price": "$70.000"
+    },
+    {
+      "name": "Create an event with GPS",
+      "price": "$25.000"
+    },
+    {
+      "name": "LifeInvader designing a template for a client",
+      "price": "$45.000"
+    },
+    {
+      "name": "Adding or updating a template",
+      "price": "$20.000"
+    },
+    {
+      "name": "Photo Shoot",
+      "price": "$100.000"
+    },
+    {
+      "name": "Sponsoring a Minor Event",
+      "price": "$150.000"
+    },
+    {
+      "name": "Sponsoring a Major Event",
+      "price": "$300.000"
+    }
+  ]
+}
