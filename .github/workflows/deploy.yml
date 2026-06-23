@@ -17,7 +17,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # Navigate to application directory
-            cd /var/www/LifeInvaderAds
+            cd /root/LifeInvaderAds
             
             # Pull latest changes
             git pull origin main
