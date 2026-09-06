@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifeinvader-v1';
+const CACHE_NAME = 'lifeinvader-v2';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_URLS = [
@@ -57,8 +57,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets: cache-first
-  if (request.url.match(/\.(js|css|png|jpg|jpeg|svg|webp|woff2?|ico)(\?.*)?$/)) {
+  // Scripts & Styles: network-first with cache fallback so new builds/updates load immediately
+  if (request.url.match(/\.(js|css)(\?.*)?$/)) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Media & static assets (images, fonts): cache-first
+  if (request.url.match(/\.(png|jpg|jpeg|svg|webp|woff2?|ico)(\?.*)?$/)) {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;

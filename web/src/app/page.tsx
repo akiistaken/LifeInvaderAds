@@ -374,7 +374,7 @@ const tryGroupArr = (arr: string[], addS: boolean = false) => {
                 const last = pfxVals.pop();
                 const pStr = pfxVals.length > 0 ? `${pfxVals.join(', ')} and ${last}` : last;
                 let realPfx = arr[0].substring(0, pfxStr.length);
-                if (addS && !hasSuffix) realPfx = pluralizeItem(realPfx, true);
+                if (!hasSuffix) realPfx = pluralizeItem(realPfx, addS);
                 return `${realPfx} ${pStr}`;
             }
         }
@@ -386,7 +386,7 @@ const tryGroupArr = (arr: string[], addS: boolean = false) => {
                 const last = sfxVals.pop();
                 const sStr = sfxVals.length > 0 ? `${sfxVals.join(', ')} and ${last}` : last;
                 let realSfx = arr[0].substring(arr[0].length - sfxStr.length);
-                if (addS) realSfx = pluralizeItem(realSfx, true);
+                realSfx = pluralizeItem(realSfx, addS);
                 return `${sStr} ${realSfx}`;
             }
         }
@@ -395,21 +395,48 @@ const tryGroupArr = (arr: string[], addS: boolean = false) => {
     return null;
 };
 
-function pluralizeItem(name: string, addS: boolean) {
+function pluralizeItem(name: string, addS: boolean): string {
     if (!name) return '';
     let displayName = name.trim();
 
-    // Check for slash notation: "singular/plural"
-    if (displayName.includes('/')) {
-        const parts = displayName.split('/');
+    // 1. Check for slash suffix notation: e.g. 'stone/s', 'leash/es', 'gift/s for bikers', 'skin/s (V.1-?)'
+    const slashSuffixRegex = /(\b\w+)\s*\/\s*(s|es)\b/i;
+    if (slashSuffixRegex.test(displayName)) {
         if (addS) {
-            return parts[1] ? parts[1].trim() : parts[0].trim() + 's';
+            return displayName.replace(slashSuffixRegex, (match, word, suffix) => {
+                const s = word === word.toUpperCase() ? suffix.toUpperCase() : suffix.toLowerCase();
+                return word + s;
+            });
         } else {
-            return parts[0].trim();
+            return displayName.replace(slashSuffixRegex, (match, word) => word);
+        }
+    }
+
+    // 2. Check for full-word singular/plural slash: e.g. 'battery/batteries', 'ruby/rubies', 'strawberry/strawberries'
+    const fullWordSlashRegex = /\b([a-zA-Z]+)\/([a-zA-Z]+)\b/;
+    const slashMatch = displayName.match(fullWordSlashRegex);
+    if (slashMatch) {
+        const [, singular, plural] = slashMatch;
+        const pLower = plural.toLowerCase();
+        const sLower = singular.toLowerCase();
+        if (pLower.endsWith('s') && (pLower.slice(0, -3) === sLower.slice(0, -1) || pLower.startsWith(sLower.slice(0, 3)))) {
+            if (addS) {
+                return displayName.replace(fullWordSlashRegex, plural);
+            } else {
+                return displayName.replace(fullWordSlashRegex, singular);
+            }
         }
     }
 
     if (!addS) return displayName;
+
+    // 3. Trailing parenthetical check: e.g. "Christmas gift (big/small)" -> "Christmas gifts (big/small)"
+    const parenMatch = displayName.match(/^(.*?)(\s*\([^)]+\))$/);
+    if (parenMatch) {
+        return pluralizeItem(parenMatch[1], true) + parenMatch[2];
+    }
+
+    const lower = displayName.toLowerCase();
 
     // Uncountable nouns — same in singular and plural
     const uncountableExact = ['fruit', 'salmon', 'trout', 'deer', 'sheep', 'fish', 'bass', 'cod', 'tuna', 'bait', 'ammo', 'ammunition', 'livestock', 'aluminum', 'steel', 'gold', 'silver', 'iron', 'copper', 'wood', 'lumber', 'timber', 'charcoal', 'gunpowder', 'rubber', 'leather', 'cloth', 'silk', 'wool', 'cotton', 'kevlar', 'carbon fiber', 'plastic', 'sugar', 'salt', 'flour', 'rice', 'corn', 'wheat', 'hay', 'grass', 'moss', 'sand', 'gravel', 'cement', 'concrete', 'asphalt', 'fuel', 'gasoline', 'diesel', 'oil', 'petroleum', 'equipment', 'furniture', 'luggage', 'clothing', 'jewelry', 'evidence', 'information', 'advice', 'feedback', 'research', 'homework', 'knowledge'];
@@ -420,16 +447,13 @@ function pluralizeItem(name: string, addS: boolean) {
     }
 
     // Handle "of type" case
-    if (displayName.toLowerCase().includes(' of type ')) {
+    if (lower.includes(' of type ')) {
         return displayName.replace(/(\w+)(\s+of type\b)/i, (match, word, suffix) => {
             if (word.toLowerCase().endsWith('s')) return match; // Already plural
             const s = word === word.toUpperCase() ? 'S' : 's';
             return word + s + suffix;
         });
     }
-
-    // Basic grammar rules for pluralization
-    const lower = displayName.toLowerCase();
 
     // Keywords pluralization (container, ticket)
     // Special case: "ticket fragment" -> pluralize "fragment" not "ticket"
@@ -1554,13 +1578,13 @@ function TemplatesForm({ templates }: { templates: any[] }) {
                                     )}
                                     {tmpl.type && (
                                         <span className={`text-[10px] px-2 py-1 rounded border uppercase tracking-widest shadow-sm whitespace-nowrap ${tmpl.type.toLowerCase().includes('service') ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                                tmpl.type.toLowerCase().includes('discount') ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                                                    'bg-slate-200 text-slate-700 border-slate-400'
+                                            tmpl.type.toLowerCase().includes('discount') ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                                                'bg-slate-200 text-slate-700 border-slate-400'
                                             }`}>{tmpl.type}</span>
                                     )}
                                     <span className={`text-[10px] px-2 py-1 rounded border uppercase tracking-widest shadow-sm whitespace-nowrap ${tmpl.adCategory.toLowerCase().includes('work') ? 'bg-zinc-500/30 text-zinc-300 border-zinc-400/50' :
-                                            tmpl.adCategory.toLowerCase().includes('others') ? 'bg-zinc-800/50 text-zinc-300 border-zinc-500' :
-                                                'bg-sky-900/30 text-sky-300 border-sky-800/50'
+                                        tmpl.adCategory.toLowerCase().includes('others') ? 'bg-zinc-800/50 text-zinc-300 border-zinc-500' :
+                                            'bg-sky-900/30 text-sky-300 border-sky-800/50'
                                         }`}>{tmpl.adCategory}</span>
                                 </div>
                             </div>
@@ -3382,15 +3406,15 @@ export default function App() {
             {globalAlert && !alertDismissed && (
                 <div className={`fixed z-[103] animate-in fade-in slide-in-from-top-4 duration-300 top-4 left-1/2 -translate-x-1/2 max-w-lg w-[calc(100%-2rem)]`}>
                     <div className={`flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border ${globalAlert.type === 'success' ? (prefs.darkMode ? 'bg-emerald-900/90 border-emerald-700' : 'bg-emerald-50 border-emerald-300') :
-                            globalAlert.type === 'danger' ? (prefs.darkMode ? 'bg-red-900/90 border-red-700' : 'bg-red-50 border-red-300') :
-                                globalAlert.type === 'warning' ? (prefs.darkMode ? 'bg-amber-900/90 border-amber-700' : 'bg-amber-50 border-amber-300') :
-                                    (prefs.darkMode ? 'bg-sky-900/90 border-sky-700' : 'bg-sky-50 border-sky-300')
+                        globalAlert.type === 'danger' ? (prefs.darkMode ? 'bg-red-900/90 border-red-700' : 'bg-red-50 border-red-300') :
+                            globalAlert.type === 'warning' ? (prefs.darkMode ? 'bg-amber-900/90 border-amber-700' : 'bg-amber-50 border-amber-300') :
+                                (prefs.darkMode ? 'bg-sky-900/90 border-sky-700' : 'bg-sky-50 border-sky-300')
                         }`}>
                         <span className="text-lg shrink-0">{globalAlert.type === 'success' ? '✅' : globalAlert.type === 'danger' ? '🚨' : globalAlert.type === 'warning' ? '⚠️' : 'ℹ️'}</span>
                         <p className={`text-sm font-medium flex-1 ${globalAlert.type === 'success' ? (prefs.darkMode ? 'text-emerald-200' : 'text-emerald-800') :
-                                globalAlert.type === 'danger' ? (prefs.darkMode ? 'text-red-200' : 'text-red-800') :
-                                    globalAlert.type === 'warning' ? (prefs.darkMode ? 'text-amber-200' : 'text-amber-800') :
-                                        (prefs.darkMode ? 'text-sky-200' : 'text-sky-800')
+                            globalAlert.type === 'danger' ? (prefs.darkMode ? 'text-red-200' : 'text-red-800') :
+                                globalAlert.type === 'warning' ? (prefs.darkMode ? 'text-amber-200' : 'text-amber-800') :
+                                    (prefs.darkMode ? 'text-sky-200' : 'text-sky-800')
                             }`}>{globalAlert.message}</p>
                         <button onClick={() => setAlertDismissed(true)} className="text-slate-400 hover:text-red-500 font-bold text-lg transition-colors shrink-0">✕</button>
                     </div>
@@ -3417,19 +3441,19 @@ export default function App() {
                             <div className="flex flex-col gap-4 animate-in fade-in duration-200">
                                 <div>
                                     <label className="text-xs font-bold text-slate-600 uppercase mb-1 block">Policy Doc URL</label>
-                                    <input type="text" value={config.doc1_url} onChange={e => setConfig({ ...config, doc1_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
+                                    <input type="text" value={config.doc1_url || ""} onChange={e => setConfig({ ...config, doc1_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-slate-600 uppercase mb-1 block">Templates Sheet URL</label>
-                                    <input type="text" value={config.templates_url} onChange={e => setConfig({ ...config, templates_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
+                                    <input type="text" value={config.templates_url || ""} onChange={e => setConfig({ ...config, templates_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-slate-600 uppercase mb-1 block">Cars/Items Sheet URL</label>
-                                    <input type="text" value={config.cars_url} onChange={e => setConfig({ ...config, cars_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
+                                    <input type="text" value={config.cars_url || ""} onChange={e => setConfig({ ...config, cars_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
                                 </div>
                                 <div>
                                     <label className="text-xs font-bold text-slate-600 uppercase mb-1 block">Manager Prices Sheet URL</label>
-                                    <input type="text" value={config.manager_url} onChange={e => setConfig({ ...config, manager_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
+                                    <input type="text" value={config.manager_url || ""} onChange={e => setConfig({ ...config, manager_url: e.target.value })} className="w-full bg-slate-50 border border-slate-300 p-2 text-xs font-mono rounded-md text-slate-800 outline-none focus:border-sky-500" />
                                 </div>
                                 <p className="text-[10px] text-slate-500 font-mono text-right">Last: {config.last_updated}</p>
                                 {configSavingMsg && <p className={`text-[10px] font-mono text-center ${configSavingMsg.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>{configSavingMsg}</p>}
@@ -3525,8 +3549,8 @@ export default function App() {
                                     <div className="flex gap-1 mb-2">
                                         {['info', 'success', 'warning', 'danger'].map(t => (
                                             <button key={t} onClick={() => setAdminAlertType(t)} className={`flex-1 py-1 rounded text-[10px] font-bold uppercase transition-colors border ${adminAlertType === t
-                                                    ? (t === 'success' ? 'bg-emerald-500 text-white border-emerald-600' : t === 'danger' ? 'bg-red-500 text-white border-red-600' : t === 'warning' ? 'bg-amber-500 text-white border-amber-600' : 'bg-sky-500 text-white border-sky-600')
-                                                    : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                                                ? (t === 'success' ? 'bg-emerald-500 text-white border-emerald-600' : t === 'danger' ? 'bg-red-500 text-white border-red-600' : t === 'warning' ? 'bg-amber-500 text-white border-amber-600' : 'bg-sky-500 text-white border-sky-600')
+                                                : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                                                 }`}>{t}</button>
                                         ))}
                                     </div>
@@ -4018,8 +4042,6 @@ export default function App() {
                     <p className="text-[9px] text-slate-400 font-mono text-center">Your notes are saved per account and sync across devices.</p>
                 </div>
             </div>
-
-
 
             {/* Cookie Consent Banner */}
             {cookieConsent === null && (

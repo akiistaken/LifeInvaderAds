@@ -11,3 +11,8 @@ _cars.xlsx
 _templates.xlsx
 _manager.xlsx
 sync_progress.txt
+data/
+auth-server/data/
+auth-server/notes.json
+auth-server/preferences.json
+auth-server/messages.json
